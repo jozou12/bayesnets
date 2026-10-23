@@ -52,13 +52,28 @@ def constructBayesNet(gameState: hunters.GameState):
     Y_RANGE = gameState.getWalls().height
     MAX_NOISE = 7
 
-    variables = []
-    edges = []
-    variableDomainsDict = {}
+    variables = [PAC, GHOST0, GHOST1, OBS0, OBS1] # constructing the variables for bayesnet  
+    edges = [(GHOST0, OBS0), (PAC, OBS0), (GHOST1, OBS1), (PAC, OBS1)] # constructing the bayesnet edges 
 
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    # populating all the possible positions pacman, ghost0, and ghost1 can be in 
+    all_positions = [] 
+    for x in range(X_RANGE): # going through all the possible x coordinates 
+        for y in range(Y_RANGE): # going through all the possible y coordinates 
+            all_positions.append((x,y)) # adding all the position combinations in the list 
+
+    # constructing the domain for pacman, ghost0, and ghost1
+    variableDomainsDict = {}
+    variableDomainsDict[PAC] = all_positions 
+    variableDomainsDict[GHOST0] = all_positions 
+    variableDomainsDict[GHOST1] = all_positions 
+
+    max_distance = X_RANGE + Y_RANGE - 2 # calculating the largest distance on the grid 
+    max_observation = max_distance + MAX_NOISE # calculating the largest possible noisy distance
+    observations = list(range(max_observation + 1)) # creating a list of all the possible noisy distances from 0 to max_observation 
+
+    # constructing the domain for both observation variables 
+    variableDomainsDict[OBS0] = observations
+    variableDomainsDict[OBS1] = observations 
 
     net = bn.constructEmptyBayesNet(variables, edges, variableDomainsDict)
     return net
