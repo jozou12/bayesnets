@@ -102,10 +102,36 @@ def joinFactors(factors: List[Factor]):
                     "Input factors: \n" +
                     "\n".join(map(str, factors)))
 
+    if len(factors) == 0: # checking if the list of factors is empty
+        raise ValueError("cannot join an empty list of factors")
 
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
-    "*** END YOUR CODE HERE ***"
+    unconditioned_set = set() # creating a set for all the unconditioned variables 
+    conditioned_set = set() # creating a set for all the conditioned variables
+
+    # going through each factor in the list 
+    for factor in factors: 
+        unconditioned_variables = factor.unconditionedVariables() # getting the unconditioned variables of the current factor
+        conditioned_variables = factor.conditionedVariables() # getting the conditioned variables of the current factor
+        unconditioned_set.update(unconditioned_variables) # adding the unconditioned variables to the set
+        conditioned_set.update(conditioned_variables) # adding the conditioned variables to the set
+
+    conditioned_set = conditioned_set - unconditioned_set # making sure to remove any variables that are also unconditioned
+
+    variable_domains_dict = factors[0].variableDomainsDict() # getting the variable domains from the first factor
+
+    new_factor = Factor(unconditioned_set, conditioned_set, variable_domains_dict) # creating a new factor with the combined variables
+    all_assignments = new_factor.getAllPossibleAssignmentDicts() # getting all possible assignments for the new factor
+    
+    # going through each possible assignment
+    for assignment in all_assignments: 
+        probability = 1 # starting the probability at 1 to begin multiplying
+
+        for factor in factors: # going through each factor
+            probability *= factor.getProbability(assignment) # multiplying the probability for the current assignment
+
+        new_factor.setProbability(assignment, probability) # setting the calculated probability in the new factor
+    
+    return new_factor # returning the new factor
 
 ########### ########### ###########
 ########### QUESTION 3  ###########
