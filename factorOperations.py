@@ -181,7 +181,32 @@ def eliminateWithCallTracking(callTrackingList=None):
                     "unconditionedVariables: " + str(factor.unconditionedVariables()))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        #raiseNotDefined()
+        factors = [factor]
+        unconditioned_set = set()
+        conditioned_set = set()
+        # going through each factor in the list 
+        for factor in factors: 
+            unconditioned_variables = factor.unconditionedVariables() # getting the unconditioned variables of the current factor
+            conditioned_variables = factor.conditionedVariables() # getting the conditioned variables of the current factor
+            unconditioned_set.update(unconditioned_variables) # adding the unconditioned variables to the set
+            conditioned_set.update(conditioned_variables) # adding the conditioned variables to the set
+        unconditioned_set = unconditioned_set - {eliminationVariable} # making sure to remove the variable that is being eliminated
+        variable_domains_dict = factors[0].variableDomainsDict() # getting the variable domains from the first factor
+        elimination_values = variable_domains_dict[eliminationVariable] # getting all the possible values of the elimination variable
+        new_factor = Factor(unconditioned_set, conditioned_set, variable_domains_dict) # creating a new factor with the combined variables
+        all_assignments = new_factor.getAllPossibleAssignmentDicts() # getting all possible assignments for the new factor
+           
+        # going through each possible assignment
+        for assignment in all_assignments: 
+            probability = 0 # starting the probability at 0 to begin adding
+        
+            for value in elimination_values: # going through each factor
+                full_assignment = dict(assignment)  # copying the assignment so the original one is not changed
+                full_assignment[eliminationVariable] = value # adding the elimination variable's value to the assignment
+                probability += factor.getProbability(full_assignment) # adding the probability for the current full assignment
+            new_factor.setProbability(assignment, probability) # setting the calculated probability in the new factor
+        return new_factor
         "*** END YOUR CODE HERE ***"
 
     return eliminate
